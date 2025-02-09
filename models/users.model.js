@@ -1,11 +1,15 @@
-var mongoose = require("mongoose");
+// var mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 //user model
 const Schema = mongoose.Schema;
 const userModelSchema = new Schema({
-    userId : Schema.Types.ObjectId,
-    userGrade : Number,
-    userEmail : {type : String, required : true},
-    userPassword : {type : String, required : true}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
+    id : Schema.Types.ObjectId,
+    grade : Number,
+    email : {type : String, required : true},
+    password : {type : String, required : true}                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  
 });
-module.exports = mongoose.model("users", userModelSchema);
+
+const User = mongoose.model("users", userModelSchema);
+
+export default User;

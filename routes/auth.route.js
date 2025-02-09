@@ -1,13 +1,18 @@
-module.exports = function(app){
-    var users = require("../controllers/auth.controller.js");
-    
-    //Route to fetch all users
-    app.get('/api/auth/login', users.signIn);
+import * as users from "../controllers/auth.controller.js";
+import express from "express"
 
-    //Route to add a new user
-    app.post('/addUser', users.addUser);
+const authRouter = express.Router();
 
-    //Route to delete a user
-    app.delete('/deleteUser/:id', users.deleteUser);
+authRouter.post("/login", users.signIn);
+
+authRouter.post("/signup", users.signup);
+// const authRoutes = (app) => {
+//     // var users = require("../controllers/auth.controller.js");
     
-}
+//     //Route to fetch all users
+//     app.post('/login', users.signIn);
+
+    
+// }
+
+export default authRouter;

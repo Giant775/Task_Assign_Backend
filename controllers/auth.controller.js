@@ -1,28 +1,34 @@
 import bcrypt from "bcrypt"
 // import jwt from 'jsonwebtoken'
 
-var User = require("../models/users.model");
-// import User from "../models/users.model"
-const jwtservice = require("../services/jwtservice");
-// import jwtservice from "../services/jwtservice"
+// var User = require("../models/users.model");
+// const jwtservice = require("../services/jwtservice");
+import User from "../models/users.model.js";
+import {generateToken} from "../services/jwtservice.js";
+
+
 
 // Control signina
-exports.signIn = async function(req, res) {
+export const signIn = async function(req, res) {
+    console.log("request body:", req.body);
     try{
-        // console.log("request: ",req);
         const {email, password} = req.body;
+        console.log("email:", email);
+        console.log("password:", password);
         const user= await User.findOne({
-            userEmail : email,
+            email : email
         });
+        console.log("user:",user);
         if(!user || !(await bcrypt.compare(password, user.password))) {
             return res.status(404).json({
                 error: "Invalid credentials",
             })
         }
-        const token = jwtservice.generateToken(user);
+        
+        const token = generateToken(user);
         const data = {
-            userEmail: user.userEmail,
-            userGrade: user.userGrade
+            email: user.email,
+            grade: user.grade
         }
         res.cookie("auth_token", token, {
             httpOnly: true,
@@ -38,28 +44,32 @@ exports.signIn = async function(req, res) {
 
 
 //Add  a new user
-exports.signup = async function (req, res) {
+export const signup = async function (req, res) {
     try{
         console.log("This is reqbody:", req.body)
-        const {userEmail, userGrade, userPassword} = req.body;
-        
+        const {name, email, password} = req.body;
+        const grade = 1;
         //Check if user already exists
-        const existingUser = await User.findOne({userEmail});
+        const existingUser = await User.findOne({email});
         if(existingUser){
             return res.status(400).json({message: "User already exists"});
         }
         
         // Create new User instance
-        const hashedPassword = await bcrypt.hash(userPassword, 10);
+        const salt = await bcrypt.genSalt(10);
+        console.log("salt:", salt);
+        console.log("userPassw0rd:", password);
+        const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = new User ({
-            userGrade,
-            userEmail,
-            hashedPassword,
+            grade,
+            name,
+            email,
+            password: hashedPassword,
         })
         
         //Save the new user to the database
         await newUser.save();
-        const token = jwtservice.generateToken(newUser);
+        const token = generateToken(newUser);
 
         // Set token in HttpOnly cookie
         res.cookie("auth_token", token, {
@@ -88,33 +98,33 @@ exports.signup = async function (req, res) {
 //     }
 // }
 
-// Find all users
-exports.users = async function(req, res) {
-    try{
-        const users= await User.find({});
-        console.log(users);
-        res.status(200).json(users);
-    } catch (err){
-        res.status(500).send({message: "Some error occurred while ..."});
-    }
-};
+// // Find all users
+// exports.users = async function(req, res) {
+//     try{
+//         const users= await User.find({});
+//         console.log(users);
+//         res.status(200).json(users);
+//     } catch (err){
+//         res.status(500).send({message: "Some error occurred while ..."});
+//     }
+// };
 
 
 
-//Delete a user
-exports.deleteUser = async function (req,res) {
-    try {
-        const {id}= req.params;
+// //Delete a user
+// exports.deleteUser = async function (req,res) {
+//     try {
+//         const {id}= req.params;
         
-        //Find the user by their ID and delete
-        const deleteUser = await User.findByIdAndDelete(id);
+//         //Find the user by their ID and delete
+//         const deleteUser = await users.findByIdAndDelete(id);
         
-        if(!deleteUser){
-            return res.status(404).json({message: "User not found"});
-        }
-        res.status(200).json({message: "User deleted successfully", user: deleteUser});
-    } catch(error) {
-        console.log(error);
-        res.status(500).json({message: "Failed to delete user", error: error.message});
-    }
-}
+//         if(!deleteUser){
+//             return res.status(404).json({message: "User not found"});
+//         }
+//         res.status(200).json({message: "User deleted successfully", user: deleteUser});
+//     } catch(error) {
+//         console.log(error);
+//         res.status(500).json({message: "Failed to delete user", error: error.message});
+//     }
+// }
