@@ -16,34 +16,9 @@ mongoose
   .connect(dbUrl)
   .then(() => console.log("mongodb connected"))
   .catch((error) => console.log(error));
-// async function createProduct(){
-//     const Schema = mongoose.Schema;
-//     const userModelSchema = new Schema({
-//         productCount  : Number,
-//         productName : {type : String, required : true},
-//         userPassword : {type : String, required : true}
-//     });
-//     const userModel = mongoose.model("product", userModelSchema);
-//     const producttemp = new userModel({
-//         productCount : 0,
-//         productName : "Benz",
-//     });
-//     await producttemp.save();
-//     console.log("Model Created.");
-// };
-// createProduct();
 
 const port = 5000;
-// app.get("/", (req, res) => {
-//   res.send({ message: "Hello World" });
-// });
-require("./routes/login.route.js")(app);
-require("./routes/users.route.js")(app);
 
-// const data = new productModel({
-//     productCount : 0,
-//     productName : "Chevrolet"
-// });
-// data.save();
+require("./routes/auth.route.js")(app);
 
 app.listen(port, () => console.log(`server is running ${port}`));

@@ -1,6 +1,6 @@
 const jwt = require("jsonwebtoken");
 
-exports.generateToke = (user) => {
+exports.generateToken = (user) => {
     const token = jwt.sign({ id: user._id}, process.env.JWT_SECRET_KEY, {
         expiresIn: "1d",
     });
@@ -8,8 +8,8 @@ exports.generateToke = (user) => {
 }
 
 exports.authenticateToken = (req, res, next) => {
-    const authHeader = req.hearders.authorization;
-    const token = authHeader && authHeader.split(" ")[1];
+    const token = req.cookies.auth_token;
+
 
     if(!token) {
         return res.status(401).jso  ({ error: "Unauthorized"});
