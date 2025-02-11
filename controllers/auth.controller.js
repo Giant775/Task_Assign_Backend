@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt"
-// import jwt from 'jsonwebtoken'
+import jwt from 'jsonwebtoken'
 
 // var User = require("../models/users.model");
 // const jwtservice = require("../services/jwtservice");
@@ -47,7 +47,7 @@ export const signIn = async function(req, res) {
 export const signup = async function (req, res) {
     try{
         console.log("This is reqbody:", req.body)
-        const {name, email, password} = req.body;
+        const {email, password} = req.body;
         const grade = 1;
         //Check if user already exists
         const existingUser = await User.findOne({email});
@@ -62,7 +62,6 @@ export const signup = async function (req, res) {
         const hashedPassword = await bcrypt.hash(password, salt);
         const newUser = new User ({
             grade,
-            name,
             email,
             password: hashedPassword,
         })
@@ -86,17 +85,28 @@ export const signup = async function (req, res) {
 }
 
 // **Auth Check API**
-// exports.isMe = async function(req, res) {
-//     const token = req.cookies.auth_token;
-//     if (!token) return res.status(401).send({error: "Not authenticated"});
+export const isMe = async function(req, res) {
+    if (!req.cookies?.auth_token) return res.status(401).send({error: "Not authenticated"});
+    // if (!req.cookies?.auth_token) return res.status(401).send({error: "Not authenticated"});
+    const token = req.cookies.auth_token;
 
-//     try {
-//         const user = jwt.verify(token, process.env.JWT_SECRET_KEY);
-//         res.json({authenticated: true, user});
-//     } catch (error) {
-//         res.status(403).json({error: "Invalid token"});
-//     }
-// }
+    try {
+        const userFromToken = jwt.verify(token, process.env.JWT_SECRET_KEY);
+        const userFromDB = await User.findOne({
+            _id: userFromToken.id
+        });
+        console.log("Found user:", userFromDB)
+        if(!userFromDB) return res.status(401).send({error: "Not authenticated"});
+        const user = {
+            email: userFromDB.email,
+            grade: userFromDB.grade,
+        }
+        console.log("User info from isMe:", user);
+        res.json({authenticated: true, user});
+    } catch (error) {
+        res.status(403).json({error: "Invalid token"});
+    }
+}
 
 // // Find all users
 // exports.users = async function(req, res) {
