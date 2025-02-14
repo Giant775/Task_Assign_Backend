@@ -27,6 +27,7 @@ export const signIn = async function(req, res) {
         
         const token = generateToken(user);
         const data = {
+            id: user._id,
             email: user.email,
             grade: user.grade
         }
@@ -77,7 +78,11 @@ export const signup = async function (req, res) {
             sameSite: "Strict",
         });
         
-        res.status(201).json({message: "User added successfully", user:newUser});
+        res.status(201).json({message: "User added successfully", user: {
+            id: newUser._id,
+            email: newUser.email,
+            grade: newUser.grade
+        }});
     } catch (error) {
         console.error(error);
         res.status(500).json({message: "Failed to add user", erro: error.message});
@@ -98,6 +103,7 @@ export const isMe = async function(req, res) {
         console.log("Found user:", userFromDB)
         if(!userFromDB) return res.status(401).send({error: "Not authenticated"});
         const user = {
+            id: userFromDB._id,
             email: userFromDB.email,
             grade: userFromDB.grade,
         }
