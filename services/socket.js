@@ -5,7 +5,7 @@ let io;
 export const initSocket = (httpServer) => {
     io = new Server(httpServer, {
         cors: {
-            origin: process.env.CLIENT_URL || 'http://localhost:5173',
+            origin: process.env.CLIENT_URL || 'https://task-assign-frontend-3a0bl826i-christophers-projects-78a1b782.vercel.app',
             credentials: true,
             methods: ['GET', 'POST', 'UPDATE', 'DELETE', 'PATCH']
         }
